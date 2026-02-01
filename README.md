@@ -1,30 +1,29 @@
-# React + TypeScript + Vite
+# Multi Uploader
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Multi Uploader - это десктопное приложение на базе Electron + React + TypeScript + Vite, которое будет позволять автоматически загружать короткие видео на несколько платформ (YouTube Shorts, TikTok, Instagram, VK Clips и другие).
 
-Currently, two official plugins are available:
+## Цель проекта
+Создать удобное десктопное приложение для автопостинга коротких видео на несколько платформ одновременно с кастомным интерфейсом и безопасной архитектурой.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### На данный момент проект включает:
+ - Electron main process с кастомным окном
+ - React frontend с Vite и TypeScript
+ - Кастомную панель TitleBar с кнопками minimize, maximize и close
+ - Возможность перетаскивания окна за TitleBar
+ - Подготовку к интеграции функционала автопостинга и работы с API платформ
 
-## Expanding the ESLint configuration
+### Стек технологий:
+ - Electron - десктопное приложение
+ - React + TypeScript - фронтенд
+ - Vite - сборка и быстрый HMR
+ - styled-components - стилизация компонентов
+ - Electron ContextBridge - безопасная связь между main и renderer процессами
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Статус проекта
+ - ✔️ Настройка Electron + React + TypeScript + Vite
+ - ✔️ Кастомное окно без системного меню
+ - ✔️ TitleBar с drag и кнопками управления окном
+ - Интеграция с API платформ для автопостинга
+ - Добавление локальной очереди видео
+ - Поддержка аутентификации и токенов
+ - UI/UX для управления постами
