@@ -15,7 +15,7 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     background: ${({ theme }) => theme.background.main};
-    color: ${({ theme }) => theme.colors.textPrimary};
+    color: ${({ theme }) => theme.colors.textPrimaryNormal};
 `;
 
 export default App;

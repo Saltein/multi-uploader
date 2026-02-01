@@ -1,13 +1,15 @@
 export const theme = {
     background: {
-        main: "linear-gradient(135deg, #A1BAFE, #8D5185)",
+        main: "linear-gradient(135deg, #192035, #240b1c)",
     },
     colors: {
-        background: "#eeeeee",
-        surface: "#f5f5f5",
-        items: "#ffffff",
-        textPrimary: "#101118",
+        background: "#ffffff",
+        surface: "#ffffff08",
+        items: "#ffffff16",
+        textPrimaryNormal: "#dee1fdb3",
+        textPrimaryBright: "#f4f6ff",
         textMuted: "#757575",
+        border: "#dee1fd21",
     },
     spacing: {
         xxs: "2px",

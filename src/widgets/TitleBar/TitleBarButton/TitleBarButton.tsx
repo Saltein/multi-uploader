@@ -23,7 +23,7 @@ export const TitleBarButton = ({ type }: TitleBarButtonProps) => {
     };
 
     return (
-        <Button onClick={handleClick}>
+        <Button $type={type} onClick={handleClick}>
             {type === "minimize" ? (
                 <MinimizeIcon width="16px" height="16px" />
             ) : type === "maximize" ? (
@@ -35,7 +35,11 @@ export const TitleBarButton = ({ type }: TitleBarButtonProps) => {
     );
 };
 
-const Button = styled.button`
+interface ButtonProps {
+    $type: "minimize" | "maximize" | "close";
+}
+
+const Button = styled.button<ButtonProps>`
     all: unset;
 
     background: transparent;
@@ -45,6 +49,25 @@ const Button = styled.button`
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border-radius: ${({ theme }) => theme.radius.sm};
+    transition:
+        background 0.2s,
+        color 0.2s;
 
     -webkit-app-region: no-drag;
+
+    &:hover {
+        color: ${({ theme }) => theme.colors.textPrimaryBright};
+        background: ${({ $type }) =>
+            $type === "close"
+                ? "rgba(232, 17, 35, 0.5)" // красный как в Windows
+                : "rgba(255, 255, 255, 0.1)"};
+    }
+
+    &:active {
+        background: ${({ $type }) =>
+            $type === "close"
+                ? "rgba(232, 17, 35, 1)" // темнее красного при нажатии
+                : "rgba(255, 255, 255, 0.2)"};
+    }
 `;

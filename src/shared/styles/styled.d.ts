@@ -9,8 +9,10 @@ declare module "styled-components" {
             background: string;
             surface: string;
             items: string;
-            textPrimary: string;
+            textPrimaryNormal: string;
+            textPrimaryBright: string;
             textMuted: string;
+            border: string;
         };
         spacing: {
             xxs: string;
