@@ -37,6 +37,13 @@ export const TitleBarButton = ({ type }: TitleBarButtonProps) => {
 
 const Button = styled.button`
     all: unset;
+
+    background: transparent;
+    width: 48px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
 
     -webkit-app-region: no-drag;

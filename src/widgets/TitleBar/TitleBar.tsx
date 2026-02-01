@@ -21,23 +21,22 @@ const TitleBarWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 32px;
-    padding: 4px 8px;
-    background-color: red;
+    height: ${({ theme }) => theme.spacing.xxl};
+    background: transparent;
     -webkit-app-region: drag;
 `;
 
 const LogoAndTitle = styled.div`
     display: flex;
     align-items: center;
+    margin-left: ${({ theme }) => theme.spacing.lg};
 `;
 
 const ButtonContainer = styled.div`
     display: flex;
-    gap: 12px;
 `;
 
-const Title = styled.h1`
+const Title = styled.span`
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 200;
 `;
