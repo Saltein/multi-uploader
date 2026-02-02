@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentPage, setCurrentPage } from "../../../app/model/slice";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { APP_PAGES } from "../../../app/pages";
 
 interface NavItemProps {
@@ -15,7 +15,10 @@ export const NavPanel = () => {
     const currentPage = useSelector(selectCurrentPage);
     const [isListOpen, setIsListOpen] = useState(false);
 
-    const toggleList = () => {
+    const navRef = useRef<HTMLDivElement>(null);
+
+    const toggleList = (e: React.MouseEvent) => {
+        e.stopPropagation();
         setIsListOpen((prev) => !prev);
     };
 
@@ -28,9 +31,24 @@ export const NavPanel = () => {
         closeList();
     };
 
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (navRef.current && !navRef.current.contains(e.target as Node)) {
+                closeList();
+            }
+        };
+
+        if (isListOpen) {
+            window.addEventListener("click", handleClickOutside);
+        }
+        return () => {
+            window.removeEventListener("click", handleClickOutside);
+        };
+    }, [isListOpen]);
+
     return (
         <NavPanelWrapper>
-            <NavDropDown onClick={toggleList}>
+            <NavDropDown ref={navRef} onClick={toggleList}>
                 {!isListOpen && <NavItem>{currentPage}</NavItem>}
 
                 {isListOpen &&
@@ -51,6 +69,8 @@ export const NavPanel = () => {
         </NavPanelWrapper>
     );
 };
+
+// Styled Components ----------------------------------------------------------
 
 const NavPanelWrapper = styled.div`
     position: relative;
@@ -97,6 +117,10 @@ const NavItem = styled.div<NavItemProps>`
     height: 32px;
     width: 100%;
     transition: 0.2s;
+
+    text-shadow: ${({ $current }) =>
+        $current ? "0 0 8px #fff8" : "none"};
+
     color: ${({ $current, theme }) =>
         $current
             ? theme.colors.textPrimaryBright
