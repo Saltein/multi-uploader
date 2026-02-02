@@ -7,7 +7,7 @@ interface AppState {
 }
 
 const initialState: AppState = {
-    currentPage: APP_PAGES[0], // "home"
+    currentPage: Object.keys(APP_PAGES)[0] as AppPage, // "home"
 };
 
 const appSlice = createSlice({

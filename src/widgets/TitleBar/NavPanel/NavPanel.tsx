@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentPage, setCurrentPage } from "../../../app/model/slice";
 import { useEffect, useRef, useState } from "react";
 import { APP_PAGES } from "../../../app/pages";
+import { useNavigate } from "react-router-dom";
 
 interface NavItemProps {
     $current?: boolean;
@@ -11,6 +12,7 @@ interface NavItemProps {
 
 export const NavPanel = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const currentPage = useSelector(selectCurrentPage);
     const [isListOpen, setIsListOpen] = useState(false);
@@ -27,7 +29,8 @@ export const NavPanel = () => {
     };
 
     const selectPage = (page: string) => {
-        dispatch(setCurrentPage(page as (typeof APP_PAGES)[number]));
+        dispatch(setCurrentPage(page as (typeof APP_PAGES)[keyof typeof APP_PAGES]));
+        navigate(APP_PAGES[page as keyof typeof APP_PAGES]);
         closeList();
     };
 
@@ -52,7 +55,7 @@ export const NavPanel = () => {
                 {!isListOpen && <NavItem>{currentPage}</NavItem>}
 
                 {isListOpen &&
-                    APP_PAGES.map((page) => (
+                    Object.keys(APP_PAGES).map((page) => (
                         <NavItem
                             $isOpen={isListOpen}
                             $current={page === currentPage}
@@ -100,6 +103,8 @@ const NavDropDown = styled.div`
     border-radius: ${({ theme }) => theme.radius.sm};
     background: ${({ theme }) => theme.colors.surface};
     transition: border 0.2s;
+
+    backdrop-filter: blur(8px);
 
     overflow: hidden;
 

@@ -8,8 +8,8 @@ export const theme = {
         items: "#ffffff16",
         textPrimaryNormal: "#dee1fdb3",
         textPrimaryBright: "#f4f6ff",
-        textMuted: "#757575",
-        border: "#dee1fd21",
+        textMuted: "#aeb6d97c",
+        border: "#ffffff08",
     },
     spacing: {
         xxs: "2px",
