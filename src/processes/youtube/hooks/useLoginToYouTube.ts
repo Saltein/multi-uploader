@@ -22,13 +22,31 @@ export const useLoginToYouTube = () => {
     }
 
     async function onLoginSuccess(codeResponse: CodeResponse) {
-        console.log("Google login successful:", codeResponse);
+        console.log("Google login successful");
+
+        if (
+            !window ||
+            !window.authApi ||
+            typeof window.authApi.exchangeGoogleCode !== "function"
+        ) {
+            console.error(
+                "authApi.exchangeGoogleCode is not available. Are you running in the browser (not Electron preload)?",
+            );
+            onFailure();
+            return;
+        }
+
         try {
             const tokens = await window.authApi.exchangeGoogleCode(
                 codeResponse.code,
             );
-            console.log("Tokens received:", tokens);
-            // здесь можно сохранить refresh_token в secure storage
+            console.log("Tokens received");
+            window.authApi.saveYoutubeToken("youtube-tokens", {
+                refresh_token: tokens.refresh_token,
+                access_token: tokens.access_token,
+                issued_at: Date.now(),
+                expires_in: tokens.expires_in,
+            });
         } catch (err) {
             console.error("Failed to exchange code:", err);
             onFailure();

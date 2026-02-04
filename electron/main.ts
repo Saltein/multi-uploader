@@ -34,8 +34,6 @@ let win: BrowserWindow | null;
 // Create the main application window -------------------------------------------
 function createWindow() {
     win = new BrowserWindow({
-        icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
-
         width: 900,
         height: 590,
 
@@ -91,7 +89,7 @@ async function exchangeCodeForTokens(code: string) {
         code,
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-        redirect_uri: "http://localhost",
+        redirect_uri: "http://localhost:5173",
         grant_type: "authorization_code",
     };
 
@@ -129,16 +127,18 @@ ipcMain.handle("google:exchange-code", async (_, code: string) => {
 
 // Simple token storage with encryption -----------------------------------------
 const store = new Store();
-ipcMain.handle("save-youtube-token", async (_, { key, token }) => {
+ipcMain.handle("save-youtube-token", async (_, { key, tokens }) => {
     if (!safeStorage.isEncryptionAvailable()) {
         console.warn(
             "Шифрование недоступно, сохраняем как есть (небезопасно!)",
         );
-        store.set(key, token);
+        store.set(key, tokens);
         return;
     }
 
-    const encrypted = safeStorage.encryptString(token);
+    // safeStorage.encryptString expects a string; stringify tokens first
+    const stringified = JSON.stringify(tokens);
+    const encrypted = safeStorage.encryptString(stringified);
     store.set(key, encrypted.toString("base64")); // или сохраняем Buffer
 });
 
@@ -146,13 +146,28 @@ ipcMain.handle("get-youtube-token", async (_, key) => {
     const data = store.get(key);
     if (!data) return null;
 
-    if (typeof data === "string" && safeStorage.isEncryptionAvailable()) {
+    if (typeof data === "string") {
+        // If encryption is available, we stored base64 encrypted string
+        if (safeStorage.isEncryptionAvailable()) {
+            try {
+                const buffer = Buffer.from(data, "base64");
+                const decrypted = safeStorage.decryptString(buffer);
+                try {
+                    return JSON.parse(decrypted);
+                } catch {
+                    return decrypted;
+                }
+            } catch (err) {
+                console.error("Не удалось расшифровать токен", err);
+                return null;
+            }
+        }
+
+        // Fallback: stored a plain string (previous behaviour)
         try {
-            const buffer = Buffer.from(data, "base64");
-            return safeStorage.decryptString(buffer);
-        } catch (err) {
-            console.error("Не удалось расшифровать токен", err);
-            return null;
+            return JSON.parse(data);
+        } catch {
+            return data;
         }
     }
 

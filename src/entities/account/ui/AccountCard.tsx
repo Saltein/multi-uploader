@@ -21,12 +21,33 @@ export const AccountCard = ({
         login = googleLogin;
     }
 
+    // чисто для проверки
+    const handleGetTokens = async () => {
+        if (
+            !window ||
+            !window.authApi ||
+            typeof window.authApi.getYoutubeToken !== "function"
+        ) {
+            console.warn("authApi.getYoutubeToken is not available");
+            return;
+        }
+
+        try {
+            const tokens =
+                await window.authApi.getYoutubeToken("youtube-tokens");
+            console.log("Youtube tokens:", tokens);
+        } catch (err) {
+            console.error("Failed to get tokens:", err);
+        }
+    };
+
     return (
         <_CardWrapper $connected={connected}>
             <span>{platform}</span>
             {username && <span>{username}</span>}
             <span>{connected ? "Подключен" : "Не подключен"}</span>
             <button onClick={() => login()}>Подключить</button>
+            <button onClick={handleGetTokens}>получить токены</button>
         </_CardWrapper>
     );
 };

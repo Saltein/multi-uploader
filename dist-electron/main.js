@@ -22172,7 +22172,14 @@ var _eval = EvalError;
 var range = RangeError;
 var ref = ReferenceError;
 var syntax = SyntaxError;
-var type = TypeError;
+var type;
+var hasRequiredType;
+function requireType() {
+  if (hasRequiredType) return type;
+  hasRequiredType = 1;
+  type = TypeError;
+  return type;
+}
 var uri = URIError;
 var abs$1 = Math.abs;
 var floor$1 = Math.floor;
@@ -22418,7 +22425,7 @@ function requireCallBindApplyHelpers() {
   if (hasRequiredCallBindApplyHelpers) return callBindApplyHelpers;
   hasRequiredCallBindApplyHelpers = 1;
   var bind3 = functionBind;
-  var $TypeError2 = type;
+  var $TypeError2 = requireType();
   var $call2 = requireFunctionCall();
   var $actualApply = requireActualApply();
   callBindApplyHelpers = function callBindBasic(args) {
@@ -22491,7 +22498,7 @@ var $EvalError = _eval;
 var $RangeError = range;
 var $ReferenceError = ref;
 var $SyntaxError = syntax;
-var $TypeError$1 = type;
+var $TypeError$1 = requireType();
 var $URIError = uri;
 var abs = abs$1;
 var floor = floor$1;
@@ -22822,7 +22829,7 @@ var GetIntrinsic2 = getIntrinsic;
 var $defineProperty = GetIntrinsic2("%Object.defineProperty%", true);
 var hasToStringTag = requireShams()();
 var hasOwn$1 = hasown;
-var $TypeError = type;
+var $TypeError = requireType();
 var toStringTag = hasToStringTag ? Symbol.toStringTag : null;
 var esSetTostringtag = function setToStringTag(object, value) {
   var overrideIfSet = arguments.length > 2 && !!arguments[2] && arguments[2].force;
@@ -27513,7 +27520,6 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path$1.join(process.env.APP_ROOT
 let win;
 function createWindow() {
   win = new BrowserWindow({
-    icon: path$1.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     width: 900,
     height: 590,
     minWidth: 600,
@@ -27561,7 +27567,7 @@ async function exchangeCodeForTokens(code2) {
     code: code2,
     client_id: "64346523576-v6mh3etj7pncd1ljvpjpae6rjm6ca98m.apps.googleusercontent.com",
     client_secret: "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",
-    redirect_uri: "http://localhost",
+    redirect_uri: "http://localhost:5173",
     grant_type: "authorization_code"
   };
   try {
@@ -27593,27 +27599,40 @@ ipcMain$1.handle("google:exchange-code", async (_, code2) => {
   }
 });
 const store = new ElectronStore();
-ipcMain$1.handle("save-youtube-token", async (_, { key, token }) => {
+ipcMain$1.handle("save-youtube-token", async (_, { key, tokens }) => {
   if (!safeStorage.isEncryptionAvailable()) {
     console.warn(
       "Шифрование недоступно, сохраняем как есть (небезопасно!)"
     );
-    store.set(key, token);
+    store.set(key, tokens);
     return;
   }
-  const encrypted = safeStorage.encryptString(token);
+  const stringified = JSON.stringify(tokens);
+  const encrypted = safeStorage.encryptString(stringified);
   store.set(key, encrypted.toString("base64"));
 });
 ipcMain$1.handle("get-youtube-token", async (_, key) => {
   const data = store.get(key);
   if (!data) return null;
-  if (typeof data === "string" && safeStorage.isEncryptionAvailable()) {
+  if (typeof data === "string") {
+    if (safeStorage.isEncryptionAvailable()) {
+      try {
+        const buffer = Buffer.from(data, "base64");
+        const decrypted = safeStorage.decryptString(buffer);
+        try {
+          return JSON.parse(decrypted);
+        } catch {
+          return decrypted;
+        }
+      } catch (err) {
+        console.error("Не удалось расшифровать токен", err);
+        return null;
+      }
+    }
     try {
-      const buffer = Buffer.from(data, "base64");
-      return safeStorage.decryptString(buffer);
-    } catch (err) {
-      console.error("Не удалось расшифровать токен", err);
-      return null;
+      return JSON.parse(data);
+    } catch {
+      return data;
     }
   }
   return data;
