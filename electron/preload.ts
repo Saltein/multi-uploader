@@ -25,3 +25,12 @@ contextBridge.exposeInMainWorld("api", {
     invoke: (...args: Parameters<typeof ipcRenderer.invoke>) =>
         ipcRenderer.invoke(...args),
 });
+
+contextBridge.exposeInMainWorld("authApi", {
+    exchangeGoogleCode: (code: string) =>
+        ipcRenderer.invoke("google:exchange-code", code),
+    saveYoutubeToken: (key: string, token: string) =>
+        ipcRenderer.invoke("save-youtube-token", { key, token }),
+    getYoutubeToken: (key: string) =>
+        ipcRenderer.invoke("get-youtube-token", key),
+});

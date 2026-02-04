@@ -29,4 +29,9 @@ interface Window {
         maximize: () => void;
         close: () => void;
     };
+    authApi: {
+        exchangeGoogleCode: (code: string) => Promise<any>;
+        saveYoutubeToken: (tokens: any) => void;
+        getYoutubeToken: () => void;
+    }
 }

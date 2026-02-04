@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.11.2",
+    "axios": "^1.13.4",
+    "electron-store": "^11.0.2",
+    "googleapis": "^171.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.2.0",

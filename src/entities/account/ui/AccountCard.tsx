@@ -1,7 +1,6 @@
-import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { updateAccount } from "../model/slice";
 import { Platform } from "../model/types";
+import { useLoginToYouTube } from "../../../processes/youtube/hooks/useLoginToYouTube";
 
 interface AccountCardProps {
     id: string;
@@ -11,29 +10,23 @@ interface AccountCardProps {
 }
 
 export const AccountCard = ({
-    id,
     platform,
     username,
-    connected = true,
+    connected,
 }: AccountCardProps) => {
-    const dispatch = useDispatch();
+    const { googleLogin } = useLoginToYouTube();
 
-    const toggleConnection = () => { // назначить потом на кнопку
-        // Логика подключения/отключения аккаунта
-        dispatch( // временно просто переключаем состояние, потом будет реальная логика
-            updateAccount({
-                id,
-                platform,
-                username,
-                connected: !connected,
-            }),
-        );
-    };
+    let login = () => {};
+    if (platform === "YouTube") {
+        login = googleLogin;
+    }
 
     return (
-        <_CardWrapper $connected={connected} onClick={toggleConnection}>
+        <_CardWrapper $connected={connected}>
             <span>{platform}</span>
+            {username && <span>{username}</span>}
             <span>{connected ? "Подключен" : "Не подключен"}</span>
+            <button onClick={() => login()}>Подключить</button>
         </_CardWrapper>
     );
 };

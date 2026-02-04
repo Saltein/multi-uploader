@@ -1,8 +1,10 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, safeStorage } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { ipcMain } from "electron";
+import Store from "electron-store";
+import axios from "axios";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +31,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null;
 
+// Create the main application window -------------------------------------------
 function createWindow() {
     win = new BrowserWindow({
         icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
@@ -41,6 +44,8 @@ function createWindow() {
 
         webPreferences: {
             preload: path.join(__dirname, "preload.mjs"),
+            contextIsolation: true, // ОБЯЗАТЕЛЬНО
+            nodeIntegration: false, // ОБЯЗАТЕЛЬНО
         },
         // autoHideMenuBar: true, // 👈 скрывает меню, Alt покажет его на Windows/Linux
         frame: false, // 👈 если хочешь полностью убрать заголовок и кнопки
@@ -62,6 +67,7 @@ function createWindow() {
     }
 }
 
+// IPC handlers for window controls ---------------------------------------------
 ipcMain.on("window-minimize", () => {
     win?.minimize();
 });
@@ -77,6 +83,80 @@ ipcMain.on("window-maximize", () => {
 
 ipcMain.on("window-close", () => {
     win?.close();
+});
+
+// Обмен кода на токены ---------------------------------------------------------
+async function exchangeCodeForTokens(code: string) {
+    const data = {
+        code,
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+        redirect_uri: "http://localhost",
+        grant_type: "authorization_code",
+    };
+
+    try {
+        const response = await axios.post(
+            "https://oauth2.googleapis.com/token",
+            data,
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            },
+        );
+
+        return response.data;
+    } catch (error) {
+        // Обработка ошибок
+        if (axios.isAxiosError(error)) {
+            const errorData = error.response?.data;
+            console.error("OAuth error:", errorData);
+        }
+        throw error;
+    }
+}
+
+ipcMain.handle("google:exchange-code", async (_, code: string) => {
+    try {
+        const tokens = await exchangeCodeForTokens(code);
+        return tokens;
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+});
+
+// Simple token storage with encryption -----------------------------------------
+const store = new Store();
+ipcMain.handle("save-youtube-token", async (_, { key, token }) => {
+    if (!safeStorage.isEncryptionAvailable()) {
+        console.warn(
+            "Шифрование недоступно, сохраняем как есть (небезопасно!)",
+        );
+        store.set(key, token);
+        return;
+    }
+
+    const encrypted = safeStorage.encryptString(token);
+    store.set(key, encrypted.toString("base64")); // или сохраняем Buffer
+});
+
+ipcMain.handle("get-youtube-token", async (_, key) => {
+    const data = store.get(key);
+    if (!data) return null;
+
+    if (typeof data === "string" && safeStorage.isEncryptionAvailable()) {
+        try {
+            const buffer = Buffer.from(data, "base64");
+            return safeStorage.decryptString(buffer);
+        } catch (err) {
+            console.error("Не удалось расшифровать токен", err);
+            return null;
+        }
+    }
+
+    return data; // fallback на старые нешифрованные данные
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

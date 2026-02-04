@@ -14,3 +14,8 @@ electron.contextBridge.exposeInMainWorld("api", {
   off: (...args) => electron.ipcRenderer.off(...args),
   invoke: (...args) => electron.ipcRenderer.invoke(...args)
 });
+electron.contextBridge.exposeInMainWorld("authApi", {
+  exchangeGoogleCode: (code) => electron.ipcRenderer.invoke("google:exchange-code", code),
+  saveYoutubeToken: (key, token) => electron.ipcRenderer.invoke("save-youtube-token", { key, token }),
+  getYoutubeToken: (key) => electron.ipcRenderer.invoke("get-youtube-token", key)
+});
