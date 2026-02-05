@@ -10,6 +10,9 @@ export const theme = {
         textPrimaryBright: "#f4f6ff",
         textMuted: "#aeb6d97c",
         border: "#ffffff08",
+        red: "#ff333333",
+        green: "#33ff3333",
+        blue: "#7777ff33",
     },
     spacing: {
         xxs: "2px",

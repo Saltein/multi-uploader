@@ -13,6 +13,9 @@ declare module "styled-components" {
             textPrimaryBright: string;
             textMuted: string;
             border: string;
+            red: string;
+            green: string;
+            blue: string;
         };
         spacing: {
             xxs: string;

@@ -5,6 +5,7 @@ export interface Account {
     id: string;
     platform: Platform;
     username: string;
+    link: string;
     connected: boolean; // подключён или нет
     // Опционально — сохраненные токены для аккаунта
     tokens?: {

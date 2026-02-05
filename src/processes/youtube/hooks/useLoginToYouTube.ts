@@ -16,6 +16,7 @@ export const useLoginToYouTube = () => {
                 id: "1",
                 platform: "YouTube",
                 username: "",
+                link: "",
                 connected: false,
                 tokens: null,
             }),
@@ -42,25 +43,54 @@ export const useLoginToYouTube = () => {
                 codeResponse.code,
             );
             console.log("Tokens received");
+
             window.authApi.saveYoutubeToken("youtube-tokens", {
                 refresh_token: tokens.refresh_token,
                 access_token: tokens.access_token,
                 issued_at: Date.now(),
                 expires_in: tokens.expires_in,
             });
+
+            // ← Новый блок: получаем название канала
+            let channelName = "YouTube Channel";
+            let channelLink = "";
+            try {
+                const res = await fetch(
+                    "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${tokens.access_token}`,
+                        },
+                    },
+                );
+
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.items?.length > 0) {
+                        channelName =
+                            json.items[0].snippet.title || channelName;
+                        channelLink =
+                            json.items[0].snippet.customUrl || channelLink;
+                    }
+                }
+            } catch (apiErr) {
+                console.warn("Не удалось получить название канала", apiErr);
+                channelName = "Ошибка";
+            }
+
+            dispatch(
+                updateAccount({
+                    id: "1",
+                    platform: "YouTube",
+                    username: channelName,
+                    link: channelLink,
+                    connected: true,
+                }),
+            );
         } catch (err) {
             console.error("Failed to exchange code:", err);
             onFailure();
-            return;
         }
-        dispatch(
-            updateAccount({
-                id: "1",
-                platform: "YouTube",
-                username: "YouTubeUser",
-                connected: true,
-            }),
-        );
     }
 
     const googleLogin = useGoogleLogin({
@@ -103,6 +133,7 @@ export const useLoginToYouTube = () => {
                     id: "1",
                     platform: "YouTube",
                     username: "",
+                    link: "",
                     connected: false,
                     tokens: null,
                 }),
@@ -125,6 +156,7 @@ export const useLoginToYouTube = () => {
                 id: "1",
                 platform: "YouTube",
                 username: "",
+                link: "",
                 connected: false,
                 tokens: null,
             }),
