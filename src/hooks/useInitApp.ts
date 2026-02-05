@@ -18,12 +18,14 @@ export const useInitApp = () => {
             try {
                 const tokens =
                     await window.authApi.getYoutubeToken("youtube-tokens");
+                console.log(tokens);
                 if (tokens) {
                     dispatch(
                         updateAccount({
                             id: "1",
                             platform: "YouTube",
-                            username: "",
+                            username: tokens.channel_name,
+                            link: tokens.channel_link,
                             connected: true,
                             tokens,
                         }),

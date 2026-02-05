@@ -21,7 +21,6 @@ interface AccountCardProps {
 export const AccountCard = ({
     platform,
     username,
-    link,
     connected,
 }: AccountCardProps) => {
     const { googleLogin, googleLogout } = useLoginToYouTube();

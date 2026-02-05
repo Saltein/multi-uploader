@@ -11,10 +11,34 @@ interface AccountsState {
 
 const initialState: AccountsState = {
     accounts: [
-        { id: "1", platform: "YouTube", username: "", connected: false },
-        { id: "2", platform: "TikTok", username: "", connected: false },
-        { id: "3", platform: "Instagram", username: "", connected: false },
-        { id: "4", platform: "VK Clips", username: "", connected: false },
+        {
+            id: "1",
+            platform: "YouTube",
+            username: "",
+            link: "",
+            connected: false,
+        },
+        {
+            id: "2",
+            platform: "TikTok",
+            username: "",
+            link: "",
+            connected: false,
+        },
+        {
+            id: "3",
+            platform: "Instagram",
+            username: "",
+            link: "",
+            connected: false,
+        },
+        {
+            id: "4",
+            platform: "VK Clips",
+            username: "",
+            link: "",
+            connected: false,
+        },
     ],
     isLoading: false,
     error: null,

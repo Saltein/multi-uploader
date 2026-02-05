@@ -44,13 +44,6 @@ export const useLoginToYouTube = () => {
             );
             console.log("Tokens received");
 
-            window.authApi.saveYoutubeToken("youtube-tokens", {
-                refresh_token: tokens.refresh_token,
-                access_token: tokens.access_token,
-                issued_at: Date.now(),
-                expires_in: tokens.expires_in,
-            });
-
             // ← Новый блок: получаем название канала
             let channelName = "YouTube Channel";
             let channelLink = "";
@@ -67,10 +60,20 @@ export const useLoginToYouTube = () => {
                 if (res.ok) {
                     const json = await res.json();
                     if (json.items?.length > 0) {
+                        console.log("json", json);
                         channelName =
                             json.items[0].snippet.title || channelName;
                         channelLink =
                             json.items[0].snippet.customUrl || channelLink;
+
+                        window.authApi.saveYoutubeToken("youtube-tokens", {
+                            refresh_token: tokens.refresh_token,
+                            access_token: tokens.access_token,
+                            issued_at: Date.now(),
+                            expires_in: tokens.expires_in,
+                            channel_name: channelName,
+                            channel_link: channelLink,
+                        });
                     }
                 }
             } catch (apiErr) {

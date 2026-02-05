@@ -39,7 +39,7 @@ declare global {
         authApi: {
             exchangeGoogleCode: (code: string) => Promise<any>;
             saveYoutubeToken: (key: string, tokens: Tokens) => Promise<void>;
-            getYoutubeToken: (key: string) => Promise<any>;
+            getYoutubeToken: (key: string) => Promise<Tokens>;
         };
     }
 }
