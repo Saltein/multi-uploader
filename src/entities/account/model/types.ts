@@ -6,4 +6,11 @@ export interface Account {
     platform: Platform;
     username: string;
     connected: boolean; // подключён или нет
+    // Опционально — сохраненные токены для аккаунта
+    tokens?: {
+        refresh_token: string;
+        access_token: string;
+        issued_at: number;
+        expires_in: number;
+    } | null;
 }

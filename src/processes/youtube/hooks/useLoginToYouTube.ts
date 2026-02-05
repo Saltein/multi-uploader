@@ -17,6 +17,7 @@ export const useLoginToYouTube = () => {
                 platform: "YouTube",
                 username: "",
                 connected: false,
+                tokens: null,
             }),
         );
     }
@@ -86,5 +87,50 @@ export const useLoginToYouTube = () => {
         flow: "auth-code",
     });
 
-    return { googleLogin };
+    async function googleLogout() {
+        // Очистить сохранённые токены в main-процессе (через preload)
+        if (
+            typeof window === "undefined" ||
+            !window.authApi ||
+            typeof (window.authApi as any).saveYoutubeToken !== "function"
+        ) {
+            console.warn(
+                "authApi.saveYoutubeToken is not available. Are you running in the browser (not Electron preload)?",
+            );
+            // Обновим состояние локально
+            dispatch(
+                updateAccount({
+                    id: "1",
+                    platform: "YouTube",
+                    username: "",
+                    connected: false,
+                    tokens: null,
+                }),
+            );
+            return;
+        }
+
+        try {
+            // Используем any, т.к. preload типизирован на Tokens, а мы хотим удалить
+            await (window.authApi as any).saveYoutubeToken(
+                "youtube-tokens",
+                null,
+            );
+        } catch (err) {
+            console.warn("Failed to clear youtube tokens:", err);
+        }
+
+        dispatch(
+            updateAccount({
+                id: "1",
+                platform: "YouTube",
+                username: "",
+                connected: false,
+                tokens: null,
+            }),
+        );
+        console.log("Отключен");
+    }
+
+    return { googleLogin, googleLogout };
 };

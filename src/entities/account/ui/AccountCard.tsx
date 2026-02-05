@@ -14,11 +14,13 @@ export const AccountCard = ({
     username,
     connected,
 }: AccountCardProps) => {
-    const { googleLogin } = useLoginToYouTube();
+    const { googleLogin, googleLogout } = useLoginToYouTube();
 
     let login = () => {};
+    let logout = () => {};
     if (platform === "YouTube") {
         login = googleLogin;
+        logout = googleLogout;
     }
 
     // чисто для проверки
@@ -46,7 +48,11 @@ export const AccountCard = ({
             <span>{platform}</span>
             {username && <span>{username}</span>}
             <span>{connected ? "Подключен" : "Не подключен"}</span>
-            <button onClick={() => login()}>Подключить</button>
+            {connected ? (
+                <button onClick={() => logout()}>Отключить</button>
+            ) : (
+                <button onClick={() => login()}>Подключить</button>
+            )}
             <button onClick={handleGetTokens}>получить токены</button>
         </_CardWrapper>
     );

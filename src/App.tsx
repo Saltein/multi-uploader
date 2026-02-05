@@ -9,8 +9,11 @@ import {
     SettingsPage,
     UploadPage,
 } from "./pages";
+import { useInitApp } from "./hooks/useInitApp";
 
 function App() {
+    useInitApp();
+
     return (
         <Wrapper>
             <TitleBar />
@@ -48,7 +51,7 @@ const PageSpace = styled.div`
     align-items: center;
     overflow-y: auto;
     margin-bottom: ${({ theme }) => theme.spacing.md};
-    
+
     /* сам скроллбар */
     &::-webkit-scrollbar {
         width: 8px;
