@@ -13,9 +13,9 @@ interface AccountCardProps {
     username: string;
     link: string;
     connected?: boolean;
-    tokens: {
+    tokens?: {
         issued_at: number;
-    };
+    } | null;
 }
 
 export const AccountCard = ({

@@ -1,17 +1,30 @@
 import styled from "styled-components";
 
-export const PageWrapper = ({ children }: { children: React.ReactNode }) => {
-    return <Wrapper>{children}</Wrapper>;
+interface PageWrapperProps {
+    children: React.ReactNode;
+    direction?: "column" | "row";
+}
+
+interface WrapperProps {
+    $direction?: string;
+}
+
+export const PageWrapper = ({
+    children,
+    direction = "column",
+}: PageWrapperProps) => {
+    return <Wrapper $direction={direction}>{children}</Wrapper>;
 };
 
 // Styled Components ----------------------------------------------------------
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<WrapperProps>`
     display: flex;
-    flex-direction: column;
+    flex-direction: ${({ $direction }) => $direction};
     gap: ${({ theme }) => theme.spacing.lg};
-    padding: ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) =>
+        `${theme.spacing.md} ${theme.spacing.md} 0 ${theme.spacing.md}`};
     width: 100%;
     height: 100%;
-    background: transparent;
+    /* background: #f003; */
 `;

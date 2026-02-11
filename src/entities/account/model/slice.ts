@@ -66,7 +66,6 @@ const accountsSlice = createSlice({
 });
 
 export const { updateAccount, setLoading, setError } = accountsSlice.actions;
-
 export default accountsSlice.reducer;
 
 // Селекторы

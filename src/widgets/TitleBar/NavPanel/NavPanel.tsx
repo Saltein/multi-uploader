@@ -85,6 +85,8 @@ const NavPanelWrapper = styled.div`
     min-width: 120px;
     flex-shrink: 1;
 
+    z-index: 500;
+
     -webkit-app-region: no-drag;
 `;
 

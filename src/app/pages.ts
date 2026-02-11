@@ -1,8 +1,8 @@
 export const APP_PAGES = {
     Главная: "/dashboard",
     "Загрузка видео": "/uploads",
-    Публикации: "/posts",
-    Аналитика: "/analytics",
+    // Публикации: "/posts",
+    // Аналитика: "/analytics",
     "Подключение аккаунтов": "/accounts",
-    Настройки: "/settings",
+    // Настройки: "/settings",
 } as const;
