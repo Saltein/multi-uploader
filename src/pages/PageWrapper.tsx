@@ -1,19 +1,32 @@
 import styled from "styled-components";
+import { Subtitle } from "../shared/ui/titles/Subtitle/Subtitle";
 
 interface PageWrapperProps {
     children: React.ReactNode;
     direction?: "column" | "row";
+    gap?: string;
+    subtitle?: string;
 }
 
 interface WrapperProps {
     $direction?: string;
+    $gap?: string;
 }
 
 export const PageWrapper = ({
     children,
     direction = "column",
+    gap,
+    subtitle,
 }: PageWrapperProps) => {
-    return <Wrapper $direction={direction}>{children}</Wrapper>;
+    return (
+        <>
+            {subtitle && <Subtitle>{subtitle}</Subtitle>}
+            <Wrapper $direction={direction} $gap={gap}>
+                {children}
+            </Wrapper>
+        </>
+    );
 };
 
 // Styled Components ----------------------------------------------------------
@@ -21,7 +34,7 @@ export const PageWrapper = ({
 const Wrapper = styled.div<WrapperProps>`
     display: flex;
     flex-direction: ${({ $direction }) => $direction};
-    gap: ${({ theme }) => theme.spacing.lg};
+    gap: ${({ theme, $gap }) => ($gap ? $gap : theme.spacing.lg)};
     padding: ${({ theme }) =>
         `${theme.spacing.md} ${theme.spacing.md} 0 ${theme.spacing.md}`};
     width: 100%;

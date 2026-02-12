@@ -13,10 +13,7 @@ export const AccountsPage = () => {
     const notConnectedAccounts = useSelector(selectNotConnectedAccounts);
 
     return (
-        <PageWrapper>
-            <_Subtitle>
-                Управляйте платформами, на которые вы публикуете видео
-            </_Subtitle>
+        <PageWrapper subtitle="Управляйте платформами, на которые вы публикуете видео">
             <SectionWrapper>
                 <span>Подключенные</span>
                 <_AccountsList>
@@ -39,12 +36,6 @@ export const AccountsPage = () => {
 };
 
 // Styled Components ----------------------------------------------------------
-
-const _Subtitle = styled.h2`
-    text-align: center;
-    font-size: 14px;
-    color: ${({ theme }) => theme.colors.textMuted};
-`;
 
 const _AccountsList = styled.div`
     display: grid;
