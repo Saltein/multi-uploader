@@ -45,7 +45,8 @@ const _Label = styled.label`
 
         .icon_title {
             height: 112px;
-            color: ${({ theme }) => theme.colors.textPrimaryNormal}
+            color: ${({ theme }) => theme.colors.textPrimaryNormal};
+            text-shadow: 0 0 4px #fff8;
         }
     }
 `;
@@ -58,6 +59,7 @@ const _IconTitle = styled.div`
     color: transparent;
 
     height: 80px;
+    padding: 0 8px;
     overflow: hidden;
 `;
 
