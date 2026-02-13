@@ -2,7 +2,7 @@ import { PageWrapper } from "../PageWrapper";
 import { Player } from "../../widgets";
 import { SectionWrapper } from "../../widgets/SectionWrapper";
 import { ChoiceInput, TextInput } from "../../shared";
-import { setDescription, setTitle } from "../../processes/upload/model/slice";
+import { setDescription, setTitle, setPrivacy, setAllowComments } from "../../processes/upload/model/slice";
 import styled from "styled-components";
 import { PostButton } from "../../processes/upload/ui/PostButton/PostButton";
 
@@ -26,8 +26,19 @@ export const UploadPage = () => {
                     <ChoiceInput
                         title="Доступ"
                         values={["Открытый", "По ссылке", "Закрытый"]}
+                        reducer={(val) => {
+                            // Преобразуем строку в Privacy
+                            let privacy: "public" | "unlisted" | "private" = "public";
+                            if (val === "По ссылке") privacy = "unlisted";
+                            else if (val === "Закрытый") privacy = "private";
+                            return setPrivacy(privacy);
+                        }}
                     />
-                    <ChoiceInput title="Разрешить комментарии" />
+                    <ChoiceInput
+                        title="Разрешить комментарии"
+                        values={["Да", "Нет"]}
+                        reducer={(val) => setAllowComments(val === "Да")}
+                    />
                 </SectionWrapper>
                 <SectionWrapper>
                     <_Horizontal>
