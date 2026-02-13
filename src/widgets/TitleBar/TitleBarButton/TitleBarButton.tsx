@@ -41,6 +41,7 @@ interface ButtonProps {
 
 const Button = styled.button<ButtonProps>`
     all: unset;
+    box-sizing: border-box;
 
     background: transparent;
     width: 48px;

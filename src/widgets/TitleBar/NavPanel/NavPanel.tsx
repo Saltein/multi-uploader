@@ -102,7 +102,7 @@ const NavDropDown = styled.div`
     min-height: 32px;
     height: fit-content;
     width: 100%;
-    border-radius: ${({ theme }) => theme.radius.sm};
+    border-radius: ${({ theme }) => theme.radius.lg};
     background: ${({ theme }) => theme.colors.surface};
     transition: border 0.2s;
 

@@ -15,6 +15,7 @@ export const ConnectionButton = ({ onClick, title }: ConnectionButtonProps) => {
 
 const _Button = styled.button`
     all: unset;
+    box-sizing: border-box;
 
     display: flex;
     align-items: center;

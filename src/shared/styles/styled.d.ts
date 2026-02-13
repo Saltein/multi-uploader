@@ -17,6 +17,9 @@ declare module "styled-components" {
             green: string;
             blue: string;
             placeholder: string;
+            postButton: string;
+            postButtonGlow: string;
+            postButtonTextHover: string;
         };
         spacing: {
             xxs: string;

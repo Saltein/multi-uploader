@@ -49,8 +49,8 @@ export const Player = () => {
                             height: "100%",
                             width: "fit-content",
                             maxWidth: "280px",
-                            border: "2px solid #ffffff16",
-                            borderRadius: "8px",
+                            border: "4px solid #ffffff16",
+                            borderRadius: "16px",
                             boxShadow: "inset 0 0 96px #ffffff16",
                         }}
                         controls={isHovered}
@@ -110,6 +110,7 @@ const _Controls = styled.div`
 
 const _ClearBtn = styled.button`
     all: unset;
+    box-sizing: border-box;
     padding: ${({ theme }) => theme.spacing.sm};
     border: 2px solid ${({ theme }) => theme.colors.items};
     border-radius: ${({ theme }) => theme.radius.sm};

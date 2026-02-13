@@ -36,10 +36,7 @@ function createWindow() {
     win = new BrowserWindow({
         width: 900,
         height: 590,
-
-        minWidth: 600,
-        minHeight: 400,
-
+        resizable: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.mjs"),
             contextIsolation: true, // ОБЯЗАТЕЛЬНО

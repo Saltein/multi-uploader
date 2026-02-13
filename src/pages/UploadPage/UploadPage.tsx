@@ -1,9 +1,10 @@
 import { PageWrapper } from "../PageWrapper";
 import { Player } from "../../widgets";
 import { SectionWrapper } from "../../widgets/SectionWrapper";
-import { TextInput } from "../../shared";
+import { ChoiceInput, TextInput } from "../../shared";
 import { setDescription, setTitle } from "../../processes/upload/model/slice";
 import styled from "styled-components";
+import { PostButton } from "../../processes/upload/ui/PostButton/PostButton";
 
 export const UploadPage = () => {
     return (
@@ -22,11 +23,17 @@ export const UploadPage = () => {
                         reducer={setDescription}
                     />
                     <TextInput placeholder="Хештеги" />
-                    <TextInput placeholder="Приватность" />
-                    <TextInput placeholder="Разрешить комментарии" />
+                    <ChoiceInput
+                        title="Доступ"
+                        values={["Открытый", "По ссылке", "Закрытый"]}
+                    />
+                    <ChoiceInput title="Разрешить комментарии" />
                 </SectionWrapper>
                 <SectionWrapper>
-                    <TextInput placeholder="Запланировать публикацию" />
+                    <_Horizontal>
+                        <TextInput placeholder="Запланировать публикацию" />
+                        <PostButton />
+                    </_Horizontal>
                 </SectionWrapper>
             </_Vertical>
         </PageWrapper>
@@ -37,5 +44,10 @@ const _Vertical = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
+    gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const _Horizontal = styled.div`
+    display: flex;
     gap: ${({ theme }) => theme.spacing.md};
 `;

@@ -19,7 +19,7 @@ const _Label = styled.label`
     cursor: pointer;
     width: 273px;
     border: 4px dashed ${({ theme }) => theme.colors.surface};
-    border-radius: ${({ theme }) => theme.radius.sm};
+    border-radius: ${({ theme }) => theme.radius.lg};
     box-shadow: none;
     transition: 0.2s;
 
