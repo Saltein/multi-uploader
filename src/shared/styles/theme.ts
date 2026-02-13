@@ -13,6 +13,7 @@ export const theme = {
         red: "#ff333333",
         green: "#33ff3333",
         blue: "#7777ff33",
+        placeholder: "#2e2c36",
     },
     spacing: {
         xxs: "2px",

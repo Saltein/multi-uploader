@@ -1,14 +1,33 @@
-import { ChangeEvent, useState } from "react";
+import { Action } from "@reduxjs/toolkit";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { useDebouncedValue } from "../../../hooks";
 
 interface TextInputProps {
     placeholder?: string;
     type?: "input" | "area";
+    reducer?: (text: string) => Action; // ? - временно
 }
 
-export const TextInput = ({ placeholder, type = "input" }: TextInputProps) => {
+export const TextInput = ({
+    placeholder,
+    type = "input",
+    reducer,
+}: TextInputProps) => {
     const [focus, setFocus] = useState(false);
     const [textValue, setTextValue] = useState("");
+
+    const debouncedText = useDebouncedValue(textValue, 300);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (reducer) {
+            // временно
+            dispatch(reducer(debouncedText));
+        }
+    }, [debouncedText]);
 
     function isInputNotEmpty(e: ChangeEvent) {
         if ((e.target as HTMLInputElement).value) {
@@ -31,7 +50,18 @@ export const TextInput = ({ placeholder, type = "input" }: TextInputProps) => {
             </_Wrapper>
         );
     } else {
-        return <_TextArea placeholder={placeholder}></_TextArea>;
+        return (
+            <_Wrapper>
+                <_Placeholder $focus={focus}>{placeholder}</_Placeholder>
+                <_TextArea
+                    value={textValue}
+                    onChange={(e) => {
+                        setFocus(isInputNotEmpty(e));
+                        setTextValue(e.target.value);
+                    }}
+                ></_TextArea>
+            </_Wrapper>
+        );
     }
 };
 
@@ -47,12 +77,19 @@ const _Wrapper = styled.div`
 
 const _Placeholder = styled.span<PlaceholderProps>`
     position: absolute;
-    top: ${({ $focus }) => ($focus ? "-5px" : "10px")};
+    pointer-events: none;
+    top: ${({ $focus }) => ($focus ? "-6px" : "9px")};
     left: 12px;
     color: ${({ theme, $focus }) =>
         $focus ? theme.colors.textPrimaryNormal : theme.colors.textMuted};
 
     font-size: ${({ $focus }) => ($focus ? "12px" : "16px")};
+    background-color: ${({ theme, $focus }) =>
+        $focus ? theme.colors.placeholder : "transparent"};
+    border-radius: ${({ theme }) => theme.radius.xs};
+    padding: 0 3px;
+
+    transition: 0.1s;
 `;
 
 const _TextInput = styled.input`
@@ -67,4 +104,16 @@ const _TextInput = styled.input`
     width: 100%;
 `;
 
-const _TextArea = styled.textarea``;
+const _TextArea = styled.textarea`
+    all: unset;
+    color: ${({ theme }) => theme.colors.textPrimaryNormal};
+    &::-webkit-input-placeholder {
+        color: ${({ theme }) => theme.colors.textMuted};
+    }
+    border: 1px solid ${({ theme }) => theme.colors.items};
+    padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+    border-radius: ${({ theme }) => theme.radius.sm};
+    width: 100%;
+
+    height: 160px;
+`;
