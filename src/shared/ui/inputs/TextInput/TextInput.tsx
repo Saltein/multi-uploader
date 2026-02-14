@@ -1,8 +1,9 @@
+import styled from "styled-components";
 import { Action } from "@reduxjs/toolkit";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import styled from "styled-components";
 import { useDebouncedValue } from "../../../hooks";
+import ClearIcon from "../../../assets/icons/close.svg?react";
 
 interface TextInputProps {
     placeholder?: string;
@@ -15,7 +16,6 @@ export const TextInput = ({
     type = "input",
     reducer,
 }: TextInputProps) => {
-    const [focus, setFocus] = useState(false);
     const [textValue, setTextValue] = useState("");
 
     const debouncedText = useDebouncedValue(textValue, 300);
@@ -29,40 +29,40 @@ export const TextInput = ({
         }
     }, [debouncedText]);
 
-    function isInputNotEmpty(e: ChangeEvent) {
-        if ((e.target as HTMLInputElement).value) {
-            return true;
-        }
-        return false;
+    function clearText() {
+        setTextValue("");
     }
 
-    if (type === "input") {
-        return (
-            <_Wrapper>
-                <_Placeholder $focus={focus}>{placeholder}</_Placeholder>
+    return (
+        <_Wrapper>
+            <_Placeholder $focus={textValue !== ""}>{placeholder}</_Placeholder>
+            {type === "input" ? (
                 <_TextInput
                     value={textValue}
                     onChange={(e) => {
-                        setFocus(isInputNotEmpty(e));
                         setTextValue(e.target.value);
                     }}
+                    maxLength={100}
                 />
-            </_Wrapper>
-        );
-    } else {
-        return (
-            <_Wrapper>
-                <_Placeholder $focus={focus}>{placeholder}</_Placeholder>
-                <_TextArea
-                    value={textValue}
-                    onChange={(e) => {
-                        setFocus(isInputNotEmpty(e));
-                        setTextValue(e.target.value);
-                    }}
-                />
-            </_Wrapper>
-        );
-    }
+            ) : (
+                <>
+                    <_TextArea
+                        value={textValue}
+                        onChange={(e) => {
+                            setTextValue(e.target.value);
+                        }}
+                        maxLength={2200}
+                    />
+                    <_SymbolCounter $textValue={textValue}>
+                        {textValue.length} / 2200
+                    </_SymbolCounter>
+                </>
+            )}
+            <_ClearButton className="clearButton" onClick={clearText}>
+                <ClearIcon className="clearIcon" />
+            </_ClearButton>
+        </_Wrapper>
+    );
 };
 
 interface PlaceholderProps {
@@ -73,6 +73,12 @@ const _Wrapper = styled.div`
     display: flex;
     position: relative;
     width: 100%;
+
+    &:hover {
+        .clearButton {
+            opacity: 1;
+        }
+    }
 `;
 
 const _Placeholder = styled.span<PlaceholderProps>`
@@ -101,6 +107,7 @@ const b_BaseInput = styled.input`
     padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
     border-radius: ${({ theme }) => theme.radius.md};
     width: 100%;
+    padding-right: 32px;
 `;
 
 const _TextInput = styled(b_BaseInput)`
@@ -110,4 +117,69 @@ const _TextInput = styled(b_BaseInput)`
 const _TextArea = styled(b_BaseInput).attrs({ as: "textarea" })`
     height: 198px;
     resize: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    padding-bottom: 32px;
+
+    /* сам скроллбар */
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    /* дорожка */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+    }
+
+    /* ползунок */
+    &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colors.surface};
+        border-radius: 4px;
+    }
+
+    /* hover по ползунку */
+    &::-webkit-scrollbar-thumb:hover {
+        background: ${({ theme }) => theme.colors.items};
+    }
+`;
+
+const _ClearButton = styled.div`
+    width: 28px;
+    height: 28px;
+    margin: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    transition: 0.2s;
+    cursor: pointer;
+
+    .clearIcon {
+        width: 16px;
+        height: 16px;
+    }
+`;
+
+interface SymbolCounterProps {
+    $textValue: string;
+}
+
+const _SymbolCounter = styled.span<SymbolCounterProps>`
+    position: absolute;
+    padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+    margin: ${({ theme }) => theme.spacing.xs};
+    right: 0;
+    bottom: 0;
+    font-size: 14px;
+    color: ${({ theme, $textValue }) =>
+        $textValue ? theme.colors.textPrimaryNormal : theme.colors.textMuted};
+    border-radius: ${({ theme }) => theme.radius.sm};
+    backdrop-filter: blur(4px);
 `;
