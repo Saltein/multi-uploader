@@ -88,6 +88,14 @@ export const useLoginToYouTube = () => {
                     username: channelName,
                     link: channelLink,
                     connected: true,
+                    tokens: {
+                        refresh_token: tokens.refresh_token,
+                        access_token: tokens.access_token,
+                        issued_at: Date.now(),
+                        expires_in: tokens.expires_in,
+                        channel_name: channelName,
+                        channel_link: channelLink,
+                    },
                 }),
             );
         } catch (err) {

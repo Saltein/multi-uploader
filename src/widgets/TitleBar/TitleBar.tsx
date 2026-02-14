@@ -12,6 +12,7 @@ export const TitleBar = () => {
             <NavPanel />
             <_ButtonContainer>
                 <TitleBarButton type="minimize" />
+                <TitleBarButton type="maximize" />
                 <TitleBarButton type="close" />
             </_ButtonContainer>
         </_TitleBarWrapper>

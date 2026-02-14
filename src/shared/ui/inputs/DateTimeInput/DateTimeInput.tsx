@@ -17,12 +17,19 @@ export const DateTimeInput = ({ title }: DateTimeInputProps) => {
 
     const dispatch = useDispatch();
 
-    function concatDateTime(date: string, time: string) {
-        return `${date} ${time}`;
+    function formatDateTime(date: string, time: string) {
+        if (!date) return "";
+
+        // если время не выбрано — ставим 00:00
+        const safeTime = time || "00:00";
+
+        const isoString = new Date(`${date}T${safeTime}`).toISOString();
+
+        return isoString;
     }
 
     useEffect(() => {
-        const dateTime = concatDateTime(date, time);
+        const dateTime = formatDateTime(date, time);
         dispatch(setScheduledAt(dateTime));
     }, [date, time]);
 

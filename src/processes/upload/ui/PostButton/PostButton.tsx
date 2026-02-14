@@ -1,7 +1,28 @@
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectUploadData } from "../../model/slice";
+import { uploadToYouTube } from "../../api/youtube";
+import { selectAccounts } from "../../../../entities/account/model/slice";
+import { UploadData } from "../../api/types";
+import { selectVideo } from "../../../../entities/video/model/slice";
 
 export const PostButton = () => {
-    return <_Button>Опубликовать</_Button>;
+    const postData = useSelector(selectUploadData);
+    const youtubeAccount = useSelector(selectAccounts)[0];
+    const accessToken = youtubeAccount.tokens?.access_token;
+    const file = useSelector(selectVideo);
+
+    const uploadData = {
+        ...postData,
+        accessToken: accessToken,
+        videoFile: file,
+    } as UploadData;
+
+    function post() {
+        console.log("post", uploadData);
+        uploadToYouTube(uploadData);
+    }
+    return <_Button onClick={post}>Опубликовать</_Button>;
 };
 
 const _Button = styled.button`
