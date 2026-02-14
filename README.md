@@ -35,3 +35,10 @@ Multi Uploader - это десктопное приложение на базе 
  - Интеграция с API TikTok для автопостинга
  - Интеграция с API Instagram для автопостинга
  - Интеграция с API Vk Clips для автопостинга
+
+# Cкриншоты
+### Страница для подключения аккаунтов
+<img width="907" height="598" alt="Аккаунты" src="https://github.com/user-attachments/assets/7e7b0beb-f4eb-4d43-a5b7-695e5346d08b" />
+
+### Страница для постинга видео
+<img width="904" height="595" alt="Загрузка видео" src="https://github.com/user-attachments/assets/d97d811c-bbf1-4292-8c49-5102670078c0" />
