@@ -5,7 +5,7 @@ import { RootState } from "../../../app/store";
 interface UploadState {
     title: string;
     description: string;
-    hashtags: string[];
+    hashtags: string;
     privacy: Privacy;
     allowComments: boolean;
     scheduledAt: string | null;
@@ -14,7 +14,7 @@ interface UploadState {
 const initialState: UploadState = {
     title: "",
     description: "",
-    hashtags: [],
+    hashtags: "",
     privacy: "public",
     allowComments: true,
     scheduledAt: null,
@@ -30,7 +30,7 @@ const uploadSlice = createSlice({
         setDescription(state, action: PayloadAction<string>) {
             state.description = action.payload;
         },
-        setHashtags(state, action: PayloadAction<string[]>) {
+        setHashtags(state, action: PayloadAction<string>) {
             state.hashtags = action.payload;
         },
         setScheduledAt(state, action: PayloadAction<string>) {

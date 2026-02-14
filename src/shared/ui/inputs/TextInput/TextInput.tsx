@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Action } from "@reduxjs/toolkit";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useDebouncedValue } from "../../../hooks";
 import ClearIcon from "../../../assets/icons/close.svg?react";
@@ -42,7 +42,7 @@ export const TextInput = ({
                     onChange={(e) => {
                         setTextValue(e.target.value);
                     }}
-                    maxLength={100}
+                    maxLength={90}
                 />
             ) : (
                 <>
@@ -51,10 +51,10 @@ export const TextInput = ({
                         onChange={(e) => {
                             setTextValue(e.target.value);
                         }}
-                        maxLength={2200}
+                        maxLength={2000}
                     />
                     <_SymbolCounter $textValue={textValue}>
-                        {textValue.length} / 2200
+                        {textValue.length} / 2000
                     </_SymbolCounter>
                 </>
             )}

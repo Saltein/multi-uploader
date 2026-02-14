@@ -1,8 +1,14 @@
 import { PageWrapper } from "../PageWrapper";
 import { Player } from "../../widgets";
 import { SectionWrapper } from "../../widgets/SectionWrapper";
-import { ChoiceInput, TextInput } from "../../shared";
-import { setDescription, setTitle, setPrivacy, setAllowComments } from "../../processes/upload/model/slice";
+import { ChoiceInput, DateTimeInput, TextInput } from "../../shared";
+import {
+    setDescription,
+    setTitle,
+    setPrivacy,
+    setAllowComments,
+    setHashtags,
+} from "../../processes/upload/model/slice";
 import styled from "styled-components";
 import { PostButton } from "../../processes/upload/ui/PostButton/PostButton";
 
@@ -22,13 +28,17 @@ export const UploadPage = () => {
                         type="area"
                         reducer={setDescription}
                     />
-                    <TextInput placeholder="Хештеги" />
+                    <TextInput
+                        placeholder="Хештеги через пробел"
+                        reducer={setHashtags}
+                    />
                     <ChoiceInput
                         title="Доступ"
                         values={["Открытый", "По ссылке", "Закрытый"]}
                         reducer={(val) => {
                             // Преобразуем строку в Privacy
-                            let privacy: "public" | "unlisted" | "private" = "public";
+                            let privacy: "public" | "unlisted" | "private" =
+                                "public";
                             if (val === "По ссылке") privacy = "unlisted";
                             else if (val === "Закрытый") privacy = "private";
                             return setPrivacy(privacy);
@@ -42,7 +52,7 @@ export const UploadPage = () => {
                 </SectionWrapper>
                 <SectionWrapper>
                     <_Horizontal>
-                        <TextInput placeholder="Запланировать публикацию" />
+                        <DateTimeInput title="Запланировать" />
                         <PostButton />
                     </_Horizontal>
                 </SectionWrapper>
