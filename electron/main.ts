@@ -1,12 +1,12 @@
 import { app, BrowserWindow, safeStorage } from "electron";
-import { createRequire } from "node:module";
+// import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 import axios from "axios";
 
-const require = createRequire(import.meta.url);
+// const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
