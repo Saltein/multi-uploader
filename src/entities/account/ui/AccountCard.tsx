@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Platform } from "../model/types";
-import { useLoginToYouTube } from "../../../processes/youtube/hooks/useLoginToYouTube";
+import { useLoginToYouTube } from "../../../processes/login/youtube/hooks/useLoginToYouTube";
 import { ConnectionButton } from "../../../shared";
 import YoutubeIcon from "../../../shared/assets/icons/youtube-shorts.svg?react";
 import TikTokIcon from "../../../shared/assets/icons/tiktok.svg?react";

@@ -1,6 +1,6 @@
 import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
-import { updateAccount } from "../../../entities/account/model/slice";
+import { updateAccount } from "../../../../entities/account/model/slice";
 
 export const useLoginToYouTube = () => {
     const dispatch = useDispatch();

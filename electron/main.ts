@@ -81,7 +81,7 @@ ipcMain.on("window-close", () => {
 });
 
 // Обмен кода на токены ---------------------------------------------------------
-async function exchangeCodeForTokens(code: string) {
+async function exchangeCodeForTokensGoogle(code: string) {
     const data = {
         code,
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -114,7 +114,7 @@ async function exchangeCodeForTokens(code: string) {
 
 ipcMain.handle("google:exchange-code", async (_, code: string) => {
     try {
-        const tokens = await exchangeCodeForTokens(code);
+        const tokens = await exchangeCodeForTokensGoogle(code);
         return tokens;
     } catch (err) {
         console.error(err);
