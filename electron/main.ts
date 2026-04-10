@@ -171,13 +171,7 @@ function generateCodeVerifier() {
 }
 
 function generateCodeChallenge(verifier: string) {
-    return crypto
-        .createHash("sha256")
-        .update(verifier)
-        .digest("base64")
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
+    return crypto.createHash("sha256").update(verifier).digest("hex");
 }
 
 const TIKTOK_CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY;

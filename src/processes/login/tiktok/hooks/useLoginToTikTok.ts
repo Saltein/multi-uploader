@@ -2,6 +2,8 @@ import { useDispatch } from "react-redux";
 import { updateAccount } from "../../../../entities/account/model/slice";
 import { useEffect } from "react";
 
+let isHandled = false;
+
 export const useLoginToTikTok = () => {
     const dispatch = useDispatch();
 
@@ -29,18 +31,64 @@ export const useLoginToTikTok = () => {
     }
 
     async function handleCallback(code: string) {
-        console.log("handleCallback");
+        if (isHandled) return;
+        isHandled = true;
+
+        console.log("handleCallback", code);
+
         try {
             const tokens = await window.authApi.exchangeTikTokCode(code);
+
+            let username = "TikTok User";
+            let link = "";
+
+            try {
+                const res = await fetch(
+                    "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${tokens.access_token}`,
+                        },
+                    },
+                );
+
+                if (res.ok) {
+                    const json = await res.json();
+                    console.log("TikTok user info:", json);
+
+                    username = json.data?.user?.display_name || username;
+
+                    const openId = json.data?.user?.open_id;
+
+                    if (openId) {
+                        link = `https://www.tiktok.com/@${openId}`;
+                    }
+
+                    await window.authApi.saveTikTokToken("tiktok-tokens", {
+                        ...tokens,
+                        username,
+                        link,
+                    });
+                }
+            } catch (apiErr) {
+                console.warn(
+                    "Не удалось получить данные пользователя TikTok",
+                    apiErr,
+                );
+            }
 
             dispatch(
                 updateAccount({
                     id: "2",
                     platform: "TikTok",
-                    username: "TikTok User",
-                    link: "",
+                    username,
+                    link,
                     connected: true,
-                    tokens,
+                    tokens: {
+                        ...tokens,
+                        username,
+                        link,
+                    },
                 }),
             );
         } catch (err) {
