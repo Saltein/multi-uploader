@@ -6,6 +6,7 @@ import YoutubeIcon from "../../../shared/assets/icons/youtube-shorts.svg?react";
 import TikTokIcon from "../../../shared/assets/icons/tiktok.svg?react";
 import InstagramIcon from "../../../shared/assets/icons/instagram-reels.svg?react";
 import VkClipsIcon from "../../../shared/assets/icons/vk-clips.svg?react";
+import { useLoginToTikTok } from "../../../processes/login/tiktok/hooks/useLoginToTikTok";
 
 interface AccountCardProps {
     id: string;
@@ -24,6 +25,7 @@ export const AccountCard = ({
     connected,
 }: AccountCardProps) => {
     const { googleLogin, googleLogout } = useLoginToYouTube();
+    const { tiktokLogin, tiktokLogout } = useLoginToTikTok();
 
     let login = () => {};
     let logout = () => {};
@@ -34,12 +36,17 @@ export const AccountCard = ({
             logout = googleLogout;
             Icon = YoutubeIcon;
             break;
+
         case "TikTok":
+            login = tiktokLogin;
+            logout = tiktokLogout;
             Icon = TikTokIcon;
             break;
+
         case "Instagram":
             Icon = InstagramIcon;
             break;
+
         case "VK Clips":
             Icon = VkClipsIcon;
             break;

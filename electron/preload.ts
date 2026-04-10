@@ -28,10 +28,21 @@ contextBridge.exposeInMainWorld("api", {
 });
 
 contextBridge.exposeInMainWorld("authApi", {
-    exchangeGoogleCode: (code: string) =>
-        ipcRenderer.invoke("google:exchange-code", code),
-    saveYoutubeToken: (key: string, tokens: Tokens) =>
+    saveYoutubeToken: (key: string, tokens: Tokens | null) =>
         ipcRenderer.invoke("save-youtube-token", { key, tokens }),
     getYoutubeToken: (key: string) =>
         ipcRenderer.invoke("get-youtube-token", key),
+    exchangeGoogleCode: (code: string) =>
+        ipcRenderer.invoke("google:exchange-code", code),
+
+    saveTikTokToken: (key: string, tokens: Tokens | null) =>
+        ipcRenderer.invoke("save-tiktok-token", { key, tokens }),
+    getTikTokAuthUrl: () => ipcRenderer.invoke("tiktok:get-auth-url"),
+    exchangeTikTokCode: (code: string) =>
+        ipcRenderer.invoke("tiktok:exchange-code", code),
+    openTikTokAuthWindow: (url: string) =>
+        ipcRenderer.invoke("tiktok:oauth-window", url),
+    onTikTokCode: (callback: (code: string) => void) => {
+        ipcRenderer.on("tiktok:auth-code", (_, code) => callback(code));
+    },
 });

@@ -2,9 +2,10 @@ import { app, BrowserWindow, safeStorage } from "electron";
 // import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { ipcMain } from "electron";
+import { shell, ipcMain } from "electron";
 import Store from "electron-store";
 import axios from "axios";
+import crypto from "crypto";
 
 // const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,6 +63,45 @@ function createWindow() {
     }
 }
 
+// IPC handlers for renderer-process --------------------------------------------
+ipcMain.handle("tiktok:oauth-window", async (event, url: string) => {
+    const parentWindow = BrowserWindow.getAllWindows()[0];
+
+    win = new BrowserWindow({
+        width: 500,
+        height: 650,
+        parent: parentWindow,
+        modal: true,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+        },
+    });
+
+    win.loadURL(url);
+
+    // 🔥 ловим редирект
+    win.webContents.on("will-redirect", (event, redirectUrl) => {
+        const parsedUrl = new URL(redirectUrl);
+        const code = parsedUrl.searchParams.get("code");
+
+        if (code) {
+            event.preventDefault();
+
+            // отправляем code в renderer
+            parentWindow.webContents.send("tiktok:auth-code", code);
+
+            win?.close();
+            win = null;
+        }
+    });
+
+    return true;
+});
+ipcMain.handle("open-external", async (_, url: string) => {
+    await shell.openExternal(url);
+});
+
 // IPC handlers for window controls ---------------------------------------------
 ipcMain.on("window-minimize", () => {
     win?.minimize();
@@ -80,7 +120,7 @@ ipcMain.on("window-close", () => {
     win?.close();
 });
 
-// Обмен кода на токены ---------------------------------------------------------
+// Обмен кода на токены Google ---------------------------------------------------------
 async function exchangeCodeForTokensGoogle(code: string) {
     const data = {
         code,
@@ -122,7 +162,66 @@ ipcMain.handle("google:exchange-code", async (_, code: string) => {
     }
 });
 
-// Simple token storage with encryption -----------------------------------------
+// TikTok ------------------------------------------------------------------------
+function generateCodeVerifier() {
+    return crypto.randomBytes(64).toString("hex");
+}
+
+function generateCodeChallenge(verifier: string) {
+    return crypto.createHash("sha256").update(verifier).digest("hex");
+}
+
+const TIKTOK_CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
+const TIKTOK_CLIENT_SECRET = import.meta.env.VITE_TIKTOK_CLIENT_SECRET;
+const REDIRECT_URI = "http://localhost:5173/tiktok/callback";
+
+let codeVerifierStore: string | null = null;
+
+ipcMain.handle("tiktok:get-auth-url", async () => {
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = generateCodeChallenge(codeVerifier);
+
+    codeVerifierStore = codeVerifier;
+
+    const state = Math.random().toString(36).substring(2);
+
+    const url =
+        "https://www.tiktok.com/v2/auth/authorize/?" +
+        `client_key=${TIKTOK_CLIENT_KEY}` +
+        `&response_type=code` +
+        `&scope=user.info.basic,video.publish,video.upload` +
+        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+        `&state=${state}` +
+        `&code_challenge=${codeChallenge}` +
+        `&code_challenge_method=S256`;
+
+    return url;
+});
+
+ipcMain.handle("tiktok:exchange-code", async (_, code: string) => {
+    const params = new URLSearchParams();
+
+    params.append("client_key", TIKTOK_CLIENT_KEY);
+    params.append("client_secret", TIKTOK_CLIENT_SECRET);
+    params.append("code", code);
+    params.append("grant_type", "authorization_code");
+    params.append("redirect_uri", REDIRECT_URI);
+    params.append("code_verifier", codeVerifierStore!);
+
+    const response = await axios.post(
+        "https://open.tiktokapis.com/v2/oauth/token/",
+        params,
+        {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        },
+    );
+
+    return response.data;
+});
+
+// Simple token storage with encryption -----------------------------------------   //TODO рефакторинг, чтобы не повторялось
 const store = new Store();
 ipcMain.handle("save-youtube-token", async (_, { key, tokens }) => {
     if (!safeStorage.isEncryptionAvailable()) {
@@ -140,6 +239,53 @@ ipcMain.handle("save-youtube-token", async (_, { key, tokens }) => {
 });
 
 ipcMain.handle("get-youtube-token", async (_, key) => {
+    const data = store.get(key);
+    if (!data) return null;
+
+    if (typeof data === "string") {
+        // If encryption is available, we stored base64 encrypted string
+        if (safeStorage.isEncryptionAvailable()) {
+            try {
+                const buffer = Buffer.from(data, "base64");
+                const decrypted = safeStorage.decryptString(buffer);
+                try {
+                    return JSON.parse(decrypted);
+                } catch {
+                    return decrypted;
+                }
+            } catch (err) {
+                console.error("Не удалось расшифровать токен", err);
+                return null;
+            }
+        }
+
+        // Fallback: stored a plain string (previous behaviour)
+        try {
+            return JSON.parse(data);
+        } catch {
+            return data;
+        }
+    }
+
+    return data; // fallback на старые нешифрованные данные
+});
+
+ipcMain.handle("save-tiktok-token", async (_, { key, tokens }) => {
+    if (!safeStorage.isEncryptionAvailable()) {
+        console.warn(
+            "Шифрование недоступно, сохраняем как есть (небезопасно!)",
+        );
+        store.set(key, tokens);
+        return;
+    }
+
+    // safeStorage.encryptString expects a string; stringify tokens first
+    const stringified = JSON.stringify(tokens);
+    const encrypted = safeStorage.encryptString(stringified);
+    store.set(key, encrypted.toString("base64")); // или сохраняем Buffer
+});
+
+ipcMain.handle("get-tiktok-token", async (_, key) => {
     const data = store.get(key);
     if (!data) return null;
 

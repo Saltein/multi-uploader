@@ -37,12 +37,23 @@ declare global {
             invoke: (...args: any[]) => Promise<any>;
         };
         authApi: {
-            exchangeGoogleCode: (code: string) => Promise<any>;
-            saveYoutubeToken: (key: string, tokens: Tokens) => Promise<void>;
             getYoutubeToken: (key: string) => Promise<Tokens>;
+            exchangeGoogleCode: (code: string) => Promise<any>;
+            saveYoutubeToken: (
+                key: string,
+                tokens: Tokens | null,
+            ) => Promise<void>;
+
+            getTikTokAuthUrl: () => Promise<string>;
+            exchangeTikTokCode: (code: string) => Promise<any>;
+            saveTikTokToken: (
+                key: string,
+                tokens: Tokens | null,
+            ) => Promise<void>;
+            openTikTokAuthWindow: (url: string) => Promise<void>;
+            onTikTokCode: (callback: (code: string) => void) => void;
         };
     }
 }
 
 export {};
-
