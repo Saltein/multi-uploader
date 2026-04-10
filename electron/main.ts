@@ -31,6 +31,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
     : RENDERER_DIST;
 
 let win: BrowserWindow | null;
+let authWindow: BrowserWindow | null;
 
 // Create the main application window -------------------------------------------
 function createWindow() {
@@ -64,13 +65,11 @@ function createWindow() {
 }
 
 // IPC handlers for renderer-process --------------------------------------------
-ipcMain.handle("tiktok:oauth-window", async (event, url: string) => {
-    const parentWindow = BrowserWindow.getAllWindows()[0];
-
-    win = new BrowserWindow({
+ipcMain.handle("tiktok:oauth-window", async (_, url: string) => {
+    authWindow = new BrowserWindow({
         width: 500,
         height: 650,
-        parent: parentWindow,
+        parent: win!, // 🔥 теперь явно
         modal: true,
         webPreferences: {
             nodeIntegration: false,
@@ -78,27 +77,24 @@ ipcMain.handle("tiktok:oauth-window", async (event, url: string) => {
         },
     });
 
-    win.loadURL(url);
+    authWindow.loadURL(url);
 
-    // 🔥 ловим редирект
-    win.webContents.on("will-navigate", (event, url) => {
+    authWindow.webContents.on("will-navigate", (event, url) => {
         if (url.startsWith(REDIRECT_URI)) {
             const parsedUrl = new URL(url);
             const code = parsedUrl.searchParams.get("code");
 
-            console.log("code will-navigate", code);
-
             if (code) {
                 event.preventDefault();
 
-                const parentWindow = BrowserWindow.getAllWindows()[0];
+                console.log("SEND CODE TO RENDERER:", code);
 
-                parentWindow.webContents.send("tiktok:auth-code", code);
+                win?.webContents.send("tiktok:auth-code", code); // ✅ фикс
 
                 setTimeout(() => {
-                    win?.close();
-                    win = null;
-                }, 1000);
+                    authWindow?.close();
+                    authWindow = null;
+                }, 500);
             }
         }
     });

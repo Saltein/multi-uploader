@@ -50,6 +50,7 @@ export const useLoginToTikTok = () => {
     }
 
     useEffect(() => {
+        console.log("useEffect useLoginToTikTok");
         const unsubscribe = window.authApi.onTikTokCode((code) => {
             console.log("CODE FROM IPC:", code);
             handleCallback(code);
