@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld("authApi", {
     openTikTokAuthWindow: (url: string) =>
         ipcRenderer.invoke("tiktok:oauth-window", url),
     onTikTokCode: (callback: (code: string) => void) => {
-        ipcRenderer.on("tiktok:auth-code", (_, code) => callback(code));
+        const listener = (_: any, code: string) => callback(code);
+
+        ipcRenderer.on("tiktok:auth-code", listener);
+
+        return () => {
+            ipcRenderer.off("tiktok:auth-code", listener);
+        };
     },
 });

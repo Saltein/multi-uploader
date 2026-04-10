@@ -29,6 +29,7 @@ export const useLoginToTikTok = () => {
     }
 
     async function handleCallback(code: string) {
+        console.log("handleCallback");
         try {
             const tokens = await window.authApi.exchangeTikTokCode(code);
 
@@ -49,9 +50,14 @@ export const useLoginToTikTok = () => {
     }
 
     useEffect(() => {
-        window.authApi.onTikTokCode((code) => {
+        const unsubscribe = window.authApi.onTikTokCode((code) => {
+            console.log("CODE FROM IPC:", code);
             handleCallback(code);
         });
+
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
     async function tiktokLogout() {

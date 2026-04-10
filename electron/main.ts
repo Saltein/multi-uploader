@@ -81,18 +81,25 @@ ipcMain.handle("tiktok:oauth-window", async (event, url: string) => {
     win.loadURL(url);
 
     // 🔥 ловим редирект
-    win.webContents.on("will-redirect", (event, redirectUrl) => {
-        const parsedUrl = new URL(redirectUrl);
-        const code = parsedUrl.searchParams.get("code");
+    win.webContents.on("will-navigate", (event, url) => {
+        if (url.startsWith(REDIRECT_URI)) {
+            const parsedUrl = new URL(url);
+            const code = parsedUrl.searchParams.get("code");
 
-        if (code) {
-            event.preventDefault();
+            console.log("code will-navigate", code);
 
-            // отправляем code в renderer
-            parentWindow.webContents.send("tiktok:auth-code", code);
+            if (code) {
+                event.preventDefault();
 
-            win?.close();
-            win = null;
+                const parentWindow = BrowserWindow.getAllWindows()[0];
+
+                parentWindow.webContents.send("tiktok:auth-code", code);
+
+                setTimeout(() => {
+                    win?.close();
+                    win = null;
+                }, 1000);
+            }
         }
     });
 
@@ -168,7 +175,13 @@ function generateCodeVerifier() {
 }
 
 function generateCodeChallenge(verifier: string) {
-    return crypto.createHash("sha256").update(verifier).digest("hex");
+    return crypto
+        .createHash("sha256")
+        .update(verifier)
+        .digest("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
 }
 
 const TIKTOK_CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
@@ -199,6 +212,8 @@ ipcMain.handle("tiktok:get-auth-url", async () => {
 });
 
 ipcMain.handle("tiktok:exchange-code", async (_, code: string) => {
+    console.warn("exchange-code", code);
+
     const params = new URLSearchParams();
 
     params.append("client_key", TIKTOK_CLIENT_KEY);
@@ -217,6 +232,8 @@ ipcMain.handle("tiktok:exchange-code", async (_, code: string) => {
             },
         },
     );
+
+    console.log("tiktok:exchange-code end", response.data);
 
     return response.data;
 });

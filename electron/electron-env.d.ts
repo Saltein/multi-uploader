@@ -51,7 +51,7 @@ declare global {
                 tokens: Tokens | null,
             ) => Promise<void>;
             openTikTokAuthWindow: (url: string) => Promise<void>;
-            onTikTokCode: (callback: (code: string) => void) => void;
+            onTikTokCode: (callback: (code: string) => void) => () => void;
         };
     }
 }
